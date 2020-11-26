@@ -14,7 +14,7 @@ app.get('/usuario', function(req, res) {
     limite = Number(limite);
 
     //Para la paginación de la lista de usuarios
-    Usuario.find({ estado: true /*Se pueden agregar parámetros para filtrar los resultados de acuerdo a su contenido (letra, palabra, etc)*/ }, 'nombre email rol estado google img') //Para filtrar los campos que necesito que me regrese en la respuesta
+    Usuario.find({ estado: true /*Se pueden agregar parámetros para filtrar los resultados de acuerdo a su contenido (letra, palabra, etc)*/ }, 'nombre email role estado google img') //Para filtrar los campos que necesito que me regrese en la respuesta
         .skip(desde)
         .limit(limite)
         .exec((err, usuarios) => {
