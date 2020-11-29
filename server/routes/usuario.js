@@ -4,8 +4,9 @@ const bcrypt = require('bcrypt');
 const _ = require('underscore');
 
 const Usuario = require('../models/usuario');
+const { verificaToken, verificaAdmin_Role } = require('../middlewares/autenticacion');
 
-app.get('/usuario', function(req, res) {
+app.get('/usuario', verificaToken, (req, res) => {
 
     let desde = req.query.desde || 0;
     desde = Number(desde);
@@ -25,7 +26,7 @@ app.get('/usuario', function(req, res) {
                 });
             }
 
-            Usuario.count({ estado: true }, (err, conteo) => {
+            Usuario.countDocuments({ estado: true }, (err, conteo) => {
                 res.json({
                     ok: true,
                     usuarios,
@@ -35,7 +36,7 @@ app.get('/usuario', function(req, res) {
         });
 });
 
-app.post('/usuario', function(req, res) {
+app.post('/usuario', [verificaToken, verificaAdmin_Role], (req, res) => {
 
     let body = req.body;
 
@@ -65,12 +66,12 @@ app.post('/usuario', function(req, res) {
 
 });
 
-app.put('/usuario/:id', function(req, res) { //:id es para indicar el parámetro que se recibe
+app.put('/usuario/:id', [verificaToken, verificaAdmin_Role], function(req, res) { //:id es para indicar el parámetro que se recibe
 
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']); //Son las propiedades que si quiero que se puedan actualizar
 
-    Usuario.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, usuarioDB) => {
+    Usuario.findByIdAndUpdate(id, body, { new: true, runValidators: true, useFindAndModify: false }, (err, usuarioDB) => {
 
         if (err) {
             return res.status(400).json({
@@ -87,7 +88,7 @@ app.put('/usuario/:id', function(req, res) { //:id es para indicar el parámetro
 
 });
 
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
 
     let id = req.params.id;
     let cambiaEstado = { //Sólo quiero que cambie a false el valor del campo estado para el id especificado
@@ -95,7 +96,7 @@ app.delete('/usuario/:id', function(req, res) {
     };
 
     //Usuario.findByIdAndRemove(id, (err, udusrioBorrado) => {}) //Con esta instrucción se realiza un borrado físico en BD
-    Usuario.findByIdAndUpdate(id, cambiaEstado, { new: true, runValidators: true }, (err, usuaiorBorrado) => {
+    Usuario.findByIdAndUpdate(id, cambiaEstado, { new: true, runValidators: true, useFindAndModify: false }, (err, usuaiorBorrado) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
