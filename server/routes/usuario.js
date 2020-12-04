@@ -66,7 +66,7 @@ app.post('/usuario', [verificaToken, verificaAdmin_Role], (req, res) => {
 
 });
 
-app.put('/usuario/:id', [verificaToken, verificaAdmin_Role], function(req, res) { //:id es para indicar el parámetro que se recibe
+app.put('/usuario/:id', [verificaToken, verificaAdmin_Role], (req, res) => { //:id es para indicar el parámetro que se recibe
 
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']); //Son las propiedades que si quiero que se puedan actualizar
